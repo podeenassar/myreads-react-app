@@ -95,3 +95,4 @@ This repository is the starter code for _all_ Udacity students. Therefore, we mo
 
 For details, check out [CONTRIBUTING.md](CONTRIBUTING.md).
 # myreads-react-app
+# reactnd-project-myreads-starter
