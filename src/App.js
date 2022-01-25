@@ -1,5 +1,6 @@
 /* import files */
 import React, { useState, useEffect } from 'react';
+import { useDebounce } from 'use-debounce';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import './App.css';
 import Header from './components/Header';
@@ -17,6 +18,7 @@ const BooksApp = () => {
   const [searchBooks, setSearchBooks] = useState([]);
   const [mergedBooks, setMergedBooks] = useState([]);
   const [query, setQuery] = useState("");
+  const [value] = useDebounce(query, 500);
   
   useEffect(() => {
     BooksAPI.getAll()
@@ -31,8 +33,8 @@ const BooksApp = () => {
 
   useEffect(() => {
     let isActive = true;
-    if (query) {
-      BooksAPI.search(query).then(data => {
+    if (value) {
+      BooksAPI.search(value).then(data => {
         if (data.error) {
           setSearchBooks([])
         } else {
@@ -46,7 +48,7 @@ const BooksApp = () => {
       isActive = false;
       setSearchBooks([])
     }
-  }, [query])
+  }, [value])
 
   useEffect(() => {
     const combined = searchBooks.map(book => {
@@ -55,9 +57,7 @@ const BooksApp = () => {
       } else {
         return book;
       }
-    }
-
-    )
+    })
     setMergedBooks(combined);
   }, [searchBooks])
 
@@ -65,27 +65,25 @@ const BooksApp = () => {
     const map = new Map();
     books.map(book => map.set(book.id, book));
     return map;
-  }
-  
-
+  };
 
   const updateBookShelf = (book, whereTo) => {
     const updatedBooks = books.map(b => {
       if (b.id === book.id) {
-         book.shelf = whereTo;
+        book.shelf = whereTo;
         return book;
       }
-      return b; 
+      return b;
     })
-    if (mapOfIdBooks.has(book.id)) {
+    if (!mapOfIdBooks.has(book.id)) {
       book.shelf = whereTo;
       updatedBooks.push(book)
-    }
+      
+    };
     
     setBooks(updatedBooks);
     BooksAPI.update(book, whereTo);
-  }
-  
+  };
   
   return (
     <div className="app">
